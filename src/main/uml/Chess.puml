@@ -1,0 +1,203 @@
+@startuml
+'Chess UML Diagram
+class Game {
+    - Board board
+    - Player whitePlayer
+    - Player blackPlayer
+    - List<Move> moves
+    - GameStatus gameStatus
+    - GameRule gameRule
+
+    + Player getNextPlayer()
+    + void makeMove(Board board, Player player, Move move)
+    + GameStatus checkGameStatus()
+}
+
+Game *--> Board
+Game o--> Player
+Game --> GameStatus
+
+class GameRule {
+    + GameStatus checkGameStatus(Game game)
+    + void makeMove(Board board, Player player, Move move)
+    +
+}
+
+enum GameStatus {
+    CHECK
+    CHECKMATE
+    STALEMATE
+    ONGOING
+}
+
+class Board {
+    - Cell[][] cell
+    - List<BoardEntity> boardEntities
+
+
+    + void initializeBoard()
+    + void makeMove(Player player, Move move)
+    + Cell getCell(Position position)
+    + boolean isValidCell(Position position)
+    + void captureBoardEntity(BoardEntity entity)
+}
+Board *--> Cell
+
+class Cell {
+    - Color color
+    - Position position
+    - CellState cellState
+    - BoardEntity boardEntity
+    + CellState getCellState()
+    + void clearCell()
+}
+Cell --> Color
+Cell *--> Position
+Cell --> CellState
+
+enum CellState {
+    EMPTY
+    FILLED
+}
+abstract class BoardEntity {
+    - EntityType type
+    - Color color
+    - Position position
+    - boolean isCaptured
+    - boolean isMovedBefore
+    # {abstract} List<Move> getValidMoves()
+    # {abstract} boolean isValidMove(Move move)
+    + Position getPosition()
+}
+
+BoardEntity --> EntityType
+BoardEntity --> Color
+
+enum EntityType {
+    PAWN
+    ROOK
+    KNIGHT
+    BISHOP
+    QUEEN
+    KING
+}
+
+enum Color {
+    WHITE
+    BLACK
+}
+
+class Pawn extends BoardEntity {
+    + List<Move> getValidMoves()
+    + boolean isValidMove(Move move)
+}
+
+class Rook extends BoardEntity {
+    + List<Move> getValidMoves()
+    + boolean isValidMove(Move move)
+}
+
+class Bishop extends BoardEntity {
+    + List<Move> getValidMoves()
+    + boolean isValidMove(Move move)
+}
+
+class Knight extends BoardEntity {
+    + List<Move> getValidMoves()
+    + boolean isValidMove(Move move)
+}
+
+class Queen extends BoardEntity {
+    + List<Move> getValidMoves()
+    + boolean isValidMove(Move move)
+}
+
+class King extends BoardEntity {
+    + List<Move> getValidMoves()
+    + boolean isValidMove(Move move)
+}
+
+abstract class Player {
+    - String name
+    - Color color
+    - PlayerType playerType
+    - int points
+    - boolean isMyTurn
+
+    # Move getMove()
+}
+Player --> PlayerType
+Player --> Color
+
+enum PlayerType {
+    BOT
+    HUMAN
+}
+
+class BotPlayer extends Player {
+    - BotDifficultyLevel level
+    - BotPlayingStrategy strategy
+
+    + Move getMove()
+}
+
+class HumanPlayer extends Player {
+    + Move getMove()
+}
+abstract class Move {
+    - Cell fromCell
+    - Cell toCell
+    - BoardEntity boardEntity
+    - MoveType type
+}
+enum MoveType {
+    PAWN_PROMOTION
+    CASTLING
+    EN_PASSANT
+    STANDARD
+}
+
+class PawnPromotion extends Move {
+    + BoardEntity transformInto(BoardEntity entity)
+}
+
+class Castling extends Move {
+    - Cell rookFromCell
+    - Cell rooToCell
+    - BoardEntity boardEntity
+}
+
+class EnPassant extends Move {
+    + Move getLasMove()
+    + boolean isDoublePawnJump()
+    + void performEnPassant()
+}
+
+class Position {
+    - int rank
+    - int file
+}
+
+enum BotDifficultyLevel {
+    EASY
+    MEDIUM
+    HARD
+}
+
+interface BotPlayingStrategy {
+    + Move getMove(Player player)
+}
+
+class EasyBotPlayingStrategy implements BotPlayingStrategy {
+    + Move getMove(Player player)
+}
+
+class MediumBotPlayingStrategy implements BotPlayingStrategy {
+    + Move getMove(Player player)
+}
+
+class HardBotPlayingStrategy implements BotPlayingStrategy {
+    + Move getMove(Player player)
+}
+
+@enduml

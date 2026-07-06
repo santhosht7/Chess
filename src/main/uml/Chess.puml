@@ -9,8 +9,9 @@ class Game {
     - GameRule gameRule
 
     + Player getNextPlayer()
-    + void makeMove(Board board, Player player, Move move)
-    + GameStatus checkGameStatus()
+    + void makeMove(Player player, Move move)
+
+    + Move getLastMove()
 }
 
 Game *--> Board
@@ -19,8 +20,9 @@ Game --> GameStatus
 
 class GameRule {
     + GameStatus checkGameStatus(Game game)
-    + void makeMove(Board board, Player player, Move move)
-    +
+    + boolean isValidMove(Move move)
+
+    + boolean isDoublePawnJump(Move lastMove, Move CurrentMove)
 }
 
 enum GameStatus {
@@ -40,6 +42,7 @@ class Board {
     + Cell getCell(Position position)
     + boolean isValidCell(Position position)
     + void captureBoardEntity(BoardEntity entity)
+    + void replaceBoardEntity(BoardEntity fromEntity, BoardEntity toEntity)
 }
 Board *--> Cell
 
@@ -48,12 +51,11 @@ class Cell {
     - Position position
     - CellState cellState
     - BoardEntity boardEntity
-    + CellState getCellState()
     + void clearCell()
+    + CellState getCellState()
 }
 Cell --> Color
 Cell *--> Position
-Cell --> CellState
 
 enum CellState {
     EMPTY
@@ -122,7 +124,6 @@ abstract class Player {
     - Color color
     - PlayerType playerType
     - int points
-    - boolean isMyTurn
 
     # Move getMove()
 }
@@ -141,6 +142,8 @@ class BotPlayer extends Player {
     + Move getMove()
 }
 
+BotPlayer --> BotDifficultyLevel
+
 class HumanPlayer extends Player {
     + Move getMove()
 }
@@ -158,18 +161,15 @@ enum MoveType {
 }
 
 class PawnPromotion extends Move {
-    + BoardEntity transformInto(BoardEntity entity)
 }
 
 class Castling extends Move {
     - Cell rookFromCell
     - Cell rooToCell
-    - BoardEntity boardEntity
+    + void performCastling()
 }
 
 class EnPassant extends Move {
-    + Move getLasMove()
-    + boolean isDoublePawnJump()
     + void performEnPassant()
 }
 
@@ -185,19 +185,19 @@ enum BotDifficultyLevel {
 }
 
 interface BotPlayingStrategy {
-    + Move getMove(Player player)
+    + Move getMove(Player player, Board board)
 }
 
 class EasyBotPlayingStrategy implements BotPlayingStrategy {
-    + Move getMove(Player player)
+    + Move getMove(Player player, Board board)
 }
 
 class MediumBotPlayingStrategy implements BotPlayingStrategy {
-    + Move getMove(Player player)
+    + Move getMove(Player player,  Board board)
 }
 
 class HardBotPlayingStrategy implements BotPlayingStrategy {
-    + Move getMove(Player player)
+    + Move getMove(Player player, Board board)
 }
 
 @enduml
